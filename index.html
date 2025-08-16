@@ -41,6 +41,19 @@
         <!-- Main app content and form fields -->
         <div id="app-content" class="space-y-6">
 
+            <!-- Customer Records Section -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">Customer Records</h2>
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="flex-grow">
+                        <label for="customer-list" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select a Customer</label>
+                        <select id="customer-list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                            <option value="">-- New Customer --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <!-- System Information Section -->
             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-inner">
                 <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">System Information</h2>
@@ -48,7 +61,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label for="customer-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Customer Name</label>
-                        <input type="text" id="customer-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                        <input type="text" id="customer-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200" required>
                     </div>
                     <div>
                         <label for="model-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Furnace Model #</label>
@@ -123,8 +136,11 @@
                 </div>
             </div>
 
-            <!-- Share Button -->
-            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <!-- Action Buttons -->
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                <button id="save-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Save Customer
+                </button>
                 <button id="share-button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                     Share Results
                 </button>
@@ -132,12 +148,24 @@
         </div>
     </div>
 
-    <!-- JavaScript for Share and Data Persistence -->
+    <!-- JavaScript for Data Persistence and Share -->
     <script>
+        // Array to hold all customer data
+        let customers = [];
+        const customerList = document.getElementById('customer-list');
+        const customerNameInput = document.getElementById('customer-name');
+        
+        // Function to get a unique timestamp for new records
+        function getTimestamp() {
+            const now = new Date();
+            return now.toLocaleString();
+        }
+
         // Function to get all form data
         function getFormData() {
             return {
-                customerName: document.getElementById('customer-name').value,
+                timestamp: getTimestamp(),
+                customerName: customerNameInput.value,
                 modelNumber: document.getElementById('model-number').value,
                 serialNumber: document.getElementById('serial-number').value,
                 rcVoltage: document.getElementById('r-c-voltage').value,
@@ -155,39 +183,96 @@
         }
 
         // Function to save data to local storage
-        function saveData() {
-            const data = getFormData();
-            localStorage.setItem('furnaceChecklistData', JSON.stringify(data));
+        function saveCustomers() {
+            localStorage.setItem('furnaceChecklistCustomers', JSON.stringify(customers));
+            renderCustomerList();
         }
 
         // Function to load data from local storage
-        function loadData() {
-            const data = JSON.parse(localStorage.getItem('furnaceChecklistData'));
-            if (data) {
-                document.getElementById('customer-name').value = data.customerName || '';
-                document.getElementById('model-number').value = data.modelNumber || '';
-                document.getElementById('serial-number').value = data.serialNumber || '';
-                document.getElementById('r-c-voltage').value = data.rcVoltage || '';
-                document.getElementById('w-c-voltage').value = data.wcVoltage || '';
-                document.getElementById('thermostat-setpoint').value = data.thermostatSetpoint || '';
-                document.getElementById('thermostat-actual').value = data.thermostatActual || '';
-                document.getElementById('flame-sense-current').value = data.flameSenseCurrent || '';
-                document.getElementById('gas-inlet-pressure').value = data.gasInletPressure || '';
-                document.getElementById('gas-outlet-pressure').value = data.gasOutletPressure || '';
-                document.getElementById('supply-plenum-temp').value = data.supplyPlenumTemp || '';
-                document.getElementById('return-air-temp').value = data.returnAirTemp || '';
-                document.getElementById('condensate-blocked').checked = data.condensateBlocked || false;
-                document.getElementById('filter-clean').checked = data.filterClean || false;
+        function loadCustomers() {
+            const storedCustomers = JSON.parse(localStorage.getItem('furnaceChecklistCustomers'));
+            if (storedCustomers) {
+                customers = storedCustomers;
+            }
+            renderCustomerList();
+        }
+
+        // Function to clear all form fields
+        function clearForm() {
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+            customerList.value = "";
+        }
+
+        // Function to load a selected customer's data into the form
+        function loadCustomer(index) {
+            if (index === "") {
+                clearForm();
+                return;
+            }
+            const customer = customers[index];
+            if (customer) {
+                customerNameInput.value = customer.customerName || '';
+                document.getElementById('model-number').value = customer.modelNumber || '';
+                document.getElementById('serial-number').value = customer.serialNumber || '';
+                document.getElementById('r-c-voltage').value = customer.rcVoltage || '';
+                document.getElementById('w-c-voltage').value = customer.wcVoltage || '';
+                document.getElementById('thermostat-setpoint').value = customer.thermostatSetpoint || '';
+                document.getElementById('thermostat-actual').value = customer.thermostatActual || '';
+                document.getElementById('flame-sense-current').value = customer.flameSenseCurrent || '';
+                document.getElementById('gas-inlet-pressure').value = customer.gasInletPressure || '';
+                document.getElementById('gas-outlet-pressure').value = customer.gasOutletPressure || '';
+                document.getElementById('supply-plenum-temp').value = customer.supplyPlenumTemp || '';
+                document.getElementById('return-air-temp').value = customer.returnAirTemp || '';
+                document.getElementById('condensate-blocked').checked = customer.condensateBlocked || false;
+                document.getElementById('filter-clean').checked = customer.filterClean || false;
             }
         }
 
-        // Event listener to save data on input change
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', saveData);
+        // Function to render the customer list dropdown
+        function renderCustomerList() {
+            customerList.innerHTML = '<option value="">-- New Customer --</option>';
+            customers.forEach((customer, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${customer.customerName} - ${customer.timestamp}`;
+                customerList.appendChild(option);
+            });
+        }
+
+        // Event listener for the save button
+        document.getElementById('save-button').addEventListener('click', () => {
+            const customerName = customerNameInput.value.trim();
+            if (customerName === "") {
+                alert('Please enter a customer name to save.');
+                return;
+            }
+
+            const existingIndex = customers.findIndex(c => c.customerName.toLowerCase() === customerName.toLowerCase());
+            const formData = getFormData();
+            
+            if (existingIndex > -1) {
+                // Update existing record with the new data
+                customers[existingIndex] = formData;
+            } else {
+                // Add new customer record
+                customers.push(formData);
+            }
+            saveCustomers();
+            alert(`Customer record for "${customerName}" saved successfully!`);
+            renderCustomerList();
         });
 
-        // Load data on page load
-        window.addEventListener('load', loadData);
+        // Event listener for the customer list dropdown
+        customerList.addEventListener('change', (event) => {
+            loadCustomer(event.target.value);
+        });
 
         // Event listener for the share button
         document.getElementById('share-button').addEventListener('click', async () => {
@@ -195,6 +280,7 @@
             
             const shareText = `--- Furnace Service Checklist ---
 Customer: ${data.customerName || 'N/A'}
+Date: ${data.timestamp || 'N/A'}
 
 System Info:
 Model #: ${data.modelNumber || 'N/A'}
@@ -238,6 +324,9 @@ Filter: ${data.filterClean ? 'Clean/Replaced' : 'Needs attention'}
                 }
             }
         });
+
+        // Initial load of customers on page load
+        window.addEventListener('load', loadCustomers);
     </script>
 </body>
 </html>
