@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,6 +46,10 @@
                 <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">System Information</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label for="customer-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Customer Name</label>
+                        <input type="text" id="customer-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
                     <div>
                         <label for="model-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Furnace Model #</label>
                         <input type="text" id="model-number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
@@ -130,44 +132,90 @@
         </div>
     </div>
 
-    <!-- JavaScript for Share Functionality -->
+    <!-- JavaScript for Share and Data Persistence -->
     <script>
-        document.getElementById('share-button').addEventListener('click', async () => {
-            const model = document.getElementById('model-number').value || 'N/A';
-            const serial = document.getElementById('serial-number').value || 'N/A';
-            const rcVoltage = document.getElementById('r-c-voltage').value || 'N/A';
-            const wcVoltage = document.getElementById('w-c-voltage').value || 'N/A';
-            const thermostatSetpoint = document.getElementById('thermostat-setpoint').value || 'N/A';
-            const thermostatActual = document.getElementById('thermostat-actual').value || 'N/A';
-            const flameSenseCurrent = document.getElementById('flame-sense-current').value || 'N/A';
-            const gasInletPressure = document.getElementById('gas-inlet-pressure').value || 'N/A';
-            const gasOutletPressure = document.getElementById('gas-outlet-pressure').value || 'N/A';
-            const supplyPlenumTemp = document.getElementById('supply-plenum-temp').value || 'N/A';
-            const returnAirTemp = document.getElementById('return-air-temp').value || 'N/A';
-            const condensateChecked = document.getElementById('condensate-blocked').checked ? 'Blocked' : 'No Blockage';
-            const filterChecked = document.getElementById('filter-clean').checked ? 'Clean/Replaced' : 'Needs attention';
+        // Function to get all form data
+        function getFormData() {
+            return {
+                customerName: document.getElementById('customer-name').value,
+                modelNumber: document.getElementById('model-number').value,
+                serialNumber: document.getElementById('serial-number').value,
+                rcVoltage: document.getElementById('r-c-voltage').value,
+                wcVoltage: document.getElementById('w-c-voltage').value,
+                thermostatSetpoint: document.getElementById('thermostat-setpoint').value,
+                thermostatActual: document.getElementById('thermostat-actual').value,
+                flameSenseCurrent: document.getElementById('flame-sense-current').value,
+                gasInletPressure: document.getElementById('gas-inlet-pressure').value,
+                gasOutletPressure: document.getElementById('gas-outlet-pressure').value,
+                supplyPlenumTemp: document.getElementById('supply-plenum-temp').value,
+                returnAirTemp: document.getElementById('return-air-temp').value,
+                condensateBlocked: document.getElementById('condensate-blocked').checked,
+                filterClean: document.getElementById('filter-clean').checked
+            };
+        }
 
+        // Function to save data to local storage
+        function saveData() {
+            const data = getFormData();
+            localStorage.setItem('furnaceChecklistData', JSON.stringify(data));
+        }
+
+        // Function to load data from local storage
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('furnaceChecklistData'));
+            if (data) {
+                document.getElementById('customer-name').value = data.customerName || '';
+                document.getElementById('model-number').value = data.modelNumber || '';
+                document.getElementById('serial-number').value = data.serialNumber || '';
+                document.getElementById('r-c-voltage').value = data.rcVoltage || '';
+                document.getElementById('w-c-voltage').value = data.wcVoltage || '';
+                document.getElementById('thermostat-setpoint').value = data.thermostatSetpoint || '';
+                document.getElementById('thermostat-actual').value = data.thermostatActual || '';
+                document.getElementById('flame-sense-current').value = data.flameSenseCurrent || '';
+                document.getElementById('gas-inlet-pressure').value = data.gasInletPressure || '';
+                document.getElementById('gas-outlet-pressure').value = data.gasOutletPressure || '';
+                document.getElementById('supply-plenum-temp').value = data.supplyPlenumTemp || '';
+                document.getElementById('return-air-temp').value = data.returnAirTemp || '';
+                document.getElementById('condensate-blocked').checked = data.condensateBlocked || false;
+                document.getElementById('filter-clean').checked = data.filterClean || false;
+            }
+        }
+
+        // Event listener to save data on input change
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', saveData);
+        });
+
+        // Load data on page load
+        window.addEventListener('load', loadData);
+
+        // Event listener for the share button
+        document.getElementById('share-button').addEventListener('click', async () => {
+            const data = getFormData();
+            
             const shareText = `--- Furnace Service Checklist ---
+Customer: ${data.customerName || 'N/A'}
+
 System Info:
-Model #: ${model}
-Serial #: ${serial}
+Model #: ${data.modelNumber || 'N/A'}
+Serial #: ${data.serialNumber || 'N/A'}
 
 Electrical Readings:
-R-C Voltage: ${rcVoltage}V
-W-C Voltage: ${wcVoltage}V
-Thermostat Setpoint: ${thermostatSetpoint}°F
-Actual Temp: ${thermostatActual}°F
+R-C Voltage: ${data.rcVoltage || 'N/A'}V
+W-C Voltage: ${data.wcVoltage || 'N/A'}V
+Thermostat Setpoint: ${data.thermostatSetpoint || 'N/A'}°F
+Actual Temp: ${data.thermostatActual || 'N/A'}°F
 
 Gas & Airflow:
-Gas Inlet Pressure: ${gasInletPressure} in. wc
-Gas Outlet Pressure: ${gasOutletPressure} in. wc
-Supply Plenum Temp: ${supplyPlenumTemp}°F
-Return Air Temp: ${returnAirTemp}°F
-Flame Sense Current: ${flameSenseCurrent}µA
+Gas Inlet Pressure: ${data.gasInletPressure || 'N/A'} in. wc
+Gas Outlet Pressure: ${data.gasOutletPressure || 'N/A'} in. wc
+Supply Plenum Temp: ${data.supplyPlenumTemp || 'N/A'}°F
+Return Air Temp: ${data.returnAirTemp || 'N/A'}°F
+Flame Sense Current: ${data.flameSenseCurrent || 'N/A'}µA
 
 Service Tasks:
-Condensate: ${condensateChecked}
-Filter: ${filterChecked}
+Condensate: ${data.condensateBlocked ? 'Blocked' : 'No Blockage'}
+Filter: ${data.filterClean ? 'Clean/Replaced' : 'Needs attention'}
 `;
             
             if (navigator.share) {
