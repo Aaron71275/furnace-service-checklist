@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furnace Service Checklist</title>
+    <!-- Link to the PWA manifest file -->
+    <link rel="manifest" href="./manifest.json">
+    <!-- Link to the service worker file -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-4">
+
+    <!-- Main Container -->
+    <div class="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-orange-600 dark:text-orange-400">Furnace Service Checklist</h1>
+            <p class="text-sm md:text-base text-gray-500 dark:text-gray-400">Document furnace service readings and tasks.</p>
+        </header>
+
+        <!-- Main app content and form fields -->
+        <div id="app-content" class="space-y-6">
+
+            <!-- System Information Section -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">System Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="model-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Furnace Model #</label>
+                        <input type="text" id="model-number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="serial-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Serial #</label>
+                        <input type="text" id="serial-number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Electrical & Control Section -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">Electrical & Control Readings</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="r-c-voltage" class="block text-sm font-medium text-gray-700 dark:text-gray-300">R-C Voltage</label>
+                        <input type="number" id="r-c-voltage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="w-c-voltage" class="block text-sm font-medium text-gray-700 dark:text-gray-300">W-C Voltage</label>
+                        <input type="number" id="w-c-voltage" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="thermostat-setpoint" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Thermostat Setpoint (°F)</label>
+                        <input type="number" id="thermostat-setpoint" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="thermostat-actual" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Actual Temp (°F)</label>
+                        <input type="number" id="thermostat-actual" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gas & Airflow Section -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">Gas & Airflow Readings</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="gas-inlet-pressure" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gas Inlet Pressure (in. wc)</label>
+                        <input type="number" id="gas-inlet-pressure" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="gas-outlet-pressure" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gas Outlet Pressure (in. wc)</label>
+                        <input type="number" id="gas-outlet-pressure" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="supply-plenum-temp" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supply Plenum Temp (°F)</label>
+                        <input type="number" id="supply-plenum-temp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="return-air-temp" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Return Air Temp (°F)</label>
+                        <input type="number" id="return-air-temp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="flame-sense-current" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Flame Sense Current (µA)</label>
+                        <input type="number" id="flame-sense-current" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200">
+                    </div>
+                </div>
+
+                <!-- Checkbox for Condensate and Filter -->
+                <div class="mt-4 flex items-center">
+                    <input id="condensate-blocked" type="checkbox" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500">
+                    <label for="condensate-blocked" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Check for Condensate Blockage</label>
+                </div>
+                <div class="mt-2 flex items-center">
+                    <input id="filter-clean" type="checkbox" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500">
+                    <label for="filter-clean" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Filter Clean/Replaced</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
