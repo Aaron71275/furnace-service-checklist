@@ -118,7 +118,71 @@
                     <label for="filter-clean" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Filter Clean/Replaced</label>
                 </div>
             </div>
+
+            <!-- Share Button -->
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <button id="share-button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                    Share Results
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- JavaScript for Share Functionality -->
+    <script>
+        document.getElementById('share-button').addEventListener('click', async () => {
+            const model = document.getElementById('model-number').value || 'N/A';
+            const serial = document.getElementById('serial-number').value || 'N/A';
+            const rcVoltage = document.getElementById('r-c-voltage').value || 'N/A';
+            const wcVoltage = document.getElementById('w-c-voltage').value || 'N/A';
+            const thermostatSetpoint = document.getElementById('thermostat-setpoint').value || 'N/A';
+            const thermostatActual = document.getElementById('thermostat-actual').value || 'N/A';
+            const flameSenseCurrent = document.getElementById('flame-sense-current').value || 'N/A';
+            const gasInletPressure = document.getElementById('gas-inlet-pressure').value || 'N/A';
+            const gasOutletPressure = document.getElementById('gas-outlet-pressure').value || 'N/A';
+            const supplyPlenumTemp = document.getElementById('supply-plenum-temp').value || 'N/A';
+            const returnAirTemp = document.getElementById('return-air-temp').value || 'N/A';
+            const condensateChecked = document.getElementById('condensate-blocked').checked ? 'Blocked' : 'No Blockage';
+            const filterChecked = document.getElementById('filter-clean').checked ? 'Clean/Replaced' : 'Needs attention';
+
+            const shareText = `--- Furnace Service Checklist ---
+System Info:
+Model #: ${model}
+Serial #: ${serial}
+
+Electrical Readings:
+R-C Voltage: ${rcVoltage}V
+W-C Voltage: ${wcVoltage}V
+Thermostat Setpoint: ${thermostatSetpoint}°F
+Actual Temp: ${thermostatActual}°F
+
+Gas & Airflow:
+Gas Inlet Pressure: ${gasInletPressure} in. wc
+Gas Outlet Pressure: ${gasOutletPressure} in. wc
+Supply Plenum Temp: ${supplyPlenumTemp}°F
+Return Air Temp: ${returnAirTemp}°F
+Flame Sense Current: ${flameSenseCurrent}µA
+
+Service Tasks:
+Condensate: ${condensateChecked}
+Filter: ${filterChecked}
+`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Furnace Service Checklist Results',
+                        text: shareText
+                    });
+                    console.log('Content shared successfully');
+                } catch (error) {
+                    console.error('Error sharing content:', error);
+                }
+            } else {
+                // Fallback for browsers that do not support the Web Share API
+                alert('Web Share API is not supported in this browser.');
+            }
+        });
+    </script>
 </body>
 </html>
