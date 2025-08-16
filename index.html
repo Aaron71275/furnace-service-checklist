@@ -144,6 +144,9 @@
                 <button id="share-button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                     Share Results
                 </button>
+                <button id="delete-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Delete Customer
+                </button>
             </div>
         </div>
     </div>
@@ -154,6 +157,7 @@
         let customers = [];
         const customerList = document.getElementById('customer-list');
         const customerNameInput = document.getElementById('customer-name');
+        const deleteButton = document.getElementById('delete-button');
         
         // Function to get a unique timestamp for new records
         function getTimestamp() {
@@ -208,6 +212,7 @@
                 }
             });
             customerList.value = "";
+            deleteButton.style.display = 'none'; // Hide delete button on new customer
         }
 
         // Function to load a selected customer's data into the form
@@ -232,6 +237,7 @@
                 document.getElementById('return-air-temp').value = customer.returnAirTemp || '';
                 document.getElementById('condensate-blocked').checked = customer.condensateBlocked || false;
                 document.getElementById('filter-clean').checked = customer.filterClean || false;
+                deleteButton.style.display = 'block'; // Show delete button on existing customer
             }
         }
 
@@ -245,7 +251,7 @@
                 customerList.appendChild(option);
             });
         }
-
+        
         // Event listener for the save button
         document.getElementById('save-button').addEventListener('click', () => {
             const customerName = customerNameInput.value.trim();
@@ -268,6 +274,17 @@
             alert(`Customer record for "${customerName}" saved successfully!`);
             clearForm(); // Clears the form for the next customer
             renderCustomerList();
+        });
+
+        // Event listener for the delete button
+        document.getElementById('delete-button').addEventListener('click', () => {
+            const selectedIndex = customerList.value;
+            if (selectedIndex !== "" && confirm('Are you sure you want to delete this customer record?')) {
+                customers.splice(selectedIndex, 1);
+                saveCustomers();
+                clearForm();
+                alert('Customer record deleted.');
+            }
         });
 
         // Event listener for the customer list dropdown
@@ -327,7 +344,10 @@ Filter: ${data.filterClean ? 'Clean/Replaced' : 'Needs attention'}
         });
 
         // Initial load of customers on page load
-        window.addEventListener('load', loadCustomers);
+        window.addEventListener('load', () => {
+            loadCustomers();
+            deleteButton.style.display = 'none'; // Hide the delete button initially
+        });
     </script>
 </body>
 </html>
