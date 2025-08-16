@@ -139,7 +139,7 @@
             <!-- Action Buttons -->
             <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
                 <button id="save-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Save Customer
+                    Save & New Customer
                 </button>
                 <button id="share-button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                     Share Results
@@ -266,6 +266,7 @@
             }
             saveCustomers();
             alert(`Customer record for "${customerName}" saved successfully!`);
+            clearForm(); // Clears the form for the next customer
             renderCustomerList();
         });
 
